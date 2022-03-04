@@ -3,7 +3,8 @@ Using proc_open() with a command array (no shell)
 --FILE--
 <?php
 
-$php = getenv('TEST_PHP_EXECUTABLE');
+$php = getenv('TEST_PHP_EXECUTABLE') ?: PHP_BINARY;
+
 $ds = [
     0 => ['pipe', 'r'],
     1 => ['pipe', 'w'],
@@ -27,6 +28,13 @@ try {
 echo "\nNul byte in argument:\n";
 try {
     proc_open(["php", "array\0oops"], $ds, $pipes);
+} catch (ValueError $exception) {
+    echo $exception->getMessage() . "\n";
+}
+
+echo "\nEmpty program name:\n";
+try {
+    proc_open([""], $ds, $pipes);
 } catch (ValueError $exception) {
     echo $exception->getMessage() . "\n";
 }
@@ -75,6 +83,9 @@ Command array element 1 contains a null byte
 
 Nul byte in argument:
 Command array element 2 contains a null byte
+
+Empty program name:
+First element must contain a non-empty program name
 
 Basic usage:
 Hello World!
